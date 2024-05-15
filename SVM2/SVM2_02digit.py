@@ -161,6 +161,12 @@ import numpy as np
 SIZE_IMAGE = 20
 NUMBER_CLASSES = 10
 
+def sort_accuracy(accuracy_list):   # C, gamma, accuracy            ############### 4) 지우기
+    # 정확고가 높은 것부터 낮은 순으로 소팅한다.
+    # lambda 인자는 어차피 dummy parameter이므로 아무 문자나 써도 상관 없다.
+    # 2번 인자에 기반해서 소팅한다.
+    accuracy_list2 = sorted(accuracy_list, key=lambda _: _[2], reverse=True)
+    return accuracy_list2
 
 def load_digits_and_labels(big_image):
     """ Returns all the digits from the 'big' image and creates the corresponding labels for each image"""
@@ -227,7 +233,8 @@ def svm_evaluate(model, samples, labels):
 
     predictions = svm_predict(model, samples)
     accuracy = (labels == predictions).mean()
-    print('Percentage Accuracy: %.2f %%' % (accuracy * 100))
+    #print('Percentage Accuracy: %.2f %%' % (accuracy * 100))   ########### 2) 주석풀고 return 지우기
+    return accuracy * 100
 
 def get_hog():
     # Get hog descriptor
@@ -269,7 +276,7 @@ def get_hog():
 
     #hog = cv2.HOGDescriptor((SIZE_IMAGE, SIZE_IMAGE), (16, 16), (4, 4), (8, 8), 9, 1, -1, 0, 0.2, 1, 64, True)
 
-    #"""
+    # """
     # 2_4_KNN 예제에서 사용하였던 hog 설정값과 같다.
     hog = cv2.HOGDescriptor(
             _winSize=(SIZE_IMAGE, SIZE_IMAGE),   # 디스크립터를 만들고자 하는 영상의 크기, (20, 20).
@@ -284,7 +291,7 @@ def get_hog():
             _gammaCorrection=1,      # default
             _nlevels=64,             # default
             _signedGradient=True)
-    #"""
+    # """
 
     print(f"hog descriptor size={hog.getDescriptorSize()}")
     return hog
@@ -317,7 +324,7 @@ if __name__ == '__main__':
     for img in digits:
         hog_descriptors.append(hog.compute(deskew(img)))
     #print(1, len(hog_descriptors), type(hog_descriptors[0]), hog_descriptors[0].shape); exit()
-    #hog_descriptors = np.squeeze(hog_descriptors)      # squeeze() 할 필요없어 보여 삭제함.
+    # hog_descriptors = np.squeeze(hog_descriptors)      # squeeze() 할 필요없어 보여 삭제함.
     #print(2, len(hog_descriptors))
 
     # 5) 데이터를 학습용과 테스트 용으로 나눈다. 이들은 각각 영상과 레이블을 가진다.
@@ -340,14 +347,33 @@ if __name__ == '__main__':
     print("5.2) 학습레이블:", type(labels_train), labels_train.shape)    #  (4500,)
 
 
-    # 6) SVM 모델 객체를 하나 생성한다.
-    print('Training SVM model ...')
-    model = svm_init(C=12.5, gamma=0.50625)
 
-    # 7) 학습 데이터로 모델을 학습한다.
-    #svm_train(model, hog_descriptors_train, labels_train)
-    model.train(hog_descriptors_train, cv2.ml.ROW_SAMPLE, labels_train)
+    #########################################3 1) 지우기
+    gamma_list = [0.1, 0.3, 0.50625, 0.7, 0.9, 1.1, 1.3, 1.5]
+    C_list = [12.5]
+    accuracy_list = []
+    for C in C_list:  # 수정 필요: 같은 곳에 여러번 그리면 구분이 안됨.
+        for gamma in gamma_list:
+    #########################################3
+            # 6) SVM 모델 객체를 하나 생성한다.
+            # print('Training SVM model ...')
+            # model = svm_init(C=12.5, gamma=0.50625)
+            model = svm_init(C, gamma)
 
+            # 7) 학습 데이터로 모델을 학습한다.
+            #svm_train(model, hog_descriptors_train, labels_train)
+            model.train(hog_descriptors_train, cv2.ml.ROW_SAMPLE, labels_train)
+
+    #########################################3 3) 지우기
+            acc = svm_evaluate(model, hog_descriptors_test, labels_test)
+            print(f"C={C:4.1f}, gamma={gamma:3.1f}: accuracy={acc:5.2f}")
+            accuracy_list.append((C, gamma, acc))
+
+    print("\n정확도 순으로 소팅해서 출력한 결과입니다.")
+    accuracy_list2 = sort_accuracy(accuracy_list)
+    for C, gamma, acc in accuracy_list2:
+        print(f"C={C:4.1f}, gamma={gamma:3.1f}: accuracy={acc:5.2f}")
+    #########################################3
 
     print('Evaluating model ... ')
     #svm_evaluate(model, hog_descriptors_test, labels_test)

@@ -5,7 +5,7 @@
 # 결과 다르게 나온 sample에만 원 그리기                             :
 
 # ??1) 결과가 반전인 것들만 원으로 표시? (반전: neighbor의 1위가 result로 채택x)
-# ??2) 일부 테스트 데이터만 몇 개 뽑아서 그 중에 반전인 것들만 원으로 표시?
+# ??2) 일부 테스트 데이터만 랜덤으로 몇 개 뽑아서 그 중에 반전인 것들만 원으로 표시?
 
 # ================================================== #
 ## findNearest의 반환값 (N: 학습데이터 수) ##
@@ -69,7 +69,7 @@ def draw_image(k):
     # k 값에 따라 이웃을 고려하여 원 그리기
     for idx, point in enumerate(rand_test_data):  ############ 수정 (label은 필요x)
         label_text = idx  # 인덱스를 사용하여 0부터 오름차순으로 레이블 값 설정
-        # if label == # 1)neighbors가 동점이 나왔을 경우  2) 만약 label과 neighbors의 1위가 같지 않으면 원 그리기. 3) nearest함수 쓰지 말고 neighbor[인덱스]로 직접접근
+        # if label == # 1)neighbors가 동점이 나왔을 경우:o  2) 만약 label과 neighbors의 1위가 같지 않으면 원 그리기:o  3) nearest함수 쓰지 말고 neighbor[인덱스]로 직접접근
 
         # plt.text(point[0], point[1], str(label_text), fontsize=12, color='black', ha='center', va='center') ######### 수정(중복. 하나는 없어도 됨)
         ret, results, neighbor, dist = knn.findNearest(point.reshape(1, -1), k=k)  ############## 수정(point.reshape(1,-1)으로 2차원배열으로 변경)
@@ -77,7 +77,7 @@ def draw_image(k):
         print(results)
         unique, cnt = np.unique(neighbor, return_counts=True)
         max_cnt = np.max(cnt)
-
+        print(dist[0])
         if (cnt == max_cnt).sum() > 1 and (neighbor[0][0] != results):      # 동점인 경우
             # radius = np.mean(dist[0]) ** 0.5
             radius = np.sqrt(dist[0, k - 1])  ########### 수정(mean을 쓴 이유가 있는지?)
