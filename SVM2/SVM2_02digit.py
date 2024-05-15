@@ -161,7 +161,7 @@ import numpy as np
 SIZE_IMAGE = 20
 NUMBER_CLASSES = 10
 
-def sort_accuracy(accuracy_list):   # C, gamma, accuracy            ############### 4) 지우기
+def sort_accuracy(accuracy_list):   # C, gamma, accuracy
     # 정확고가 높은 것부터 낮은 순으로 소팅한다.
     # lambda 인자는 어차피 dummy parameter이므로 아무 문자나 써도 상관 없다.
     # 2번 인자에 기반해서 소팅한다.
@@ -347,24 +347,20 @@ if __name__ == '__main__':
     print("5.2) 학습레이블:", type(labels_train), labels_train.shape)    #  (4500,)
 
 
-
-    #########################################3 1) 지우기
     gamma_list = [0.1, 0.3, 0.50625, 0.7, 0.9, 1.1, 1.3, 1.5]
     C_list = [12.5]
     accuracy_list = []
     for C in C_list:  # 수정 필요: 같은 곳에 여러번 그리면 구분이 안됨.
         for gamma in gamma_list:
-    #########################################3
             # 6) SVM 모델 객체를 하나 생성한다.
             # print('Training SVM model ...')
-            # model = svm_init(C=12.5, gamma=0.50625)
-            model = svm_init(C, gamma)
+            model = svm_init(C=12.5, gamma=0.50625)
+            # model = svm_init(C, gamma)
 
             # 7) 학습 데이터로 모델을 학습한다.
             #svm_train(model, hog_descriptors_train, labels_train)
             model.train(hog_descriptors_train, cv2.ml.ROW_SAMPLE, labels_train)
 
-    #########################################3 3) 지우기
             acc = svm_evaluate(model, hog_descriptors_test, labels_test)
             print(f"C={C:4.1f}, gamma={gamma:3.1f}: accuracy={acc:5.2f}")
             accuracy_list.append((C, gamma, acc))
@@ -373,7 +369,7 @@ if __name__ == '__main__':
     accuracy_list2 = sort_accuracy(accuracy_list)
     for C, gamma, acc in accuracy_list2:
         print(f"C={C:4.1f}, gamma={gamma:3.1f}: accuracy={acc:5.2f}")
-    #########################################3
+
 
     print('Evaluating model ... ')
     #svm_evaluate(model, hog_descriptors_test, labels_test)
