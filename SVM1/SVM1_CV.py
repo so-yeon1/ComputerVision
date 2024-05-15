@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ====================================== 단계 1,2 (line 8~64)======================================= #
+# ====================================== 단계 1,2 (line 8~65)======================================= #
 
 nData = 100  # 각 클래스의 데이터 수
 Range = 100  # 데이터의 전체 범위
@@ -63,7 +63,6 @@ for gamma, ax in zip(gammas, axes):
     ax.imshow(RGBimg)
     ax.set_title(f'gamma:{gamma}')
     ax.axis('off')
-
 
 
 
