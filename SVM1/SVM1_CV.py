@@ -90,6 +90,8 @@ def trainMethod():
     gamma = cv2.getTrackbarPos('Gamma', 'SVM Project1_3,4,5') / 100.0
     C = cv2.getTrackbarPos('C', 'SVM Project1_3,4,5') / 100.0
 
+    if kernel == kernel_options.index(cv2.ml.SVM_POLY):
+        svm_model.setDegree(3)      # Poly 커널 차원(=양수) 설정
     svm_model.setKernel(kernel_options[kernel])
     svm_model.setGamma(gamma)
     svm_model.setC(C)
