@@ -99,8 +99,19 @@ import matplotlib.pyplot as plt
 # The data is composed of L points: [0, 100)의 범위를 가진 L개의 점(2차원: x, y) 데이터 정의
 # train data로 쓰인다.
 print('\nStep 1: Making random training data & labels..')
-L = 400       # 작은 수를 사용하면 프린트하기 수월하다.
-data = np.random.randint(0, 100, (L, 2)).astype(np.float32)
+L = 4000       # 작은 수를 사용하면 프린트하기 수월하다.
+
+if L >= 200**2:     # 학습데이터의 최대개수
+    print(f'생성할 수 있는 학습데이터의 수는 {200**2}개 미만입니다.')
+    exit(0)
+
+data = np.random.randint(0, 200, (L, 2)).astype(np.float32)
+data = np.unique(data, axis=0)  # 중복데이터 제거
+
+while len(data) < L:       # 지정한 학습데이터 수만큼 중복없는 데이터 생성
+    newData = np.random.randint(0,200,(L-len(data),2)).astype(np.float32)
+    data = np.append(data, newData, axis=0) # 제거된 중복데이터 수만큼 데이터 생성 후 append
+    data = np.unique(data, axis=0)  # 중복제거
 print('data for training:', type(data), data.shape)
 
 # We create the labels (0: red, 1: blue) for each of the L points:
@@ -108,11 +119,6 @@ print('data for training:', type(data), data.shape)
 labels = np.random.randint(0, 2, (L, 1)).astype(np.float32)
 
 print('Labels for training:', type(labels), labels.shape)
-
-# 데이터 중복 제거
-data, idx = np.unique(data, axis=0, return_index=True)
-labels = labels[idx]
-
 # --------------------------------------------------------------------------------------------
 # 단계 2: knn 학습 모델을 구축한다.
 # --------------------------------------------------------------------------------------------
@@ -189,7 +195,7 @@ def print_ret_values(ret_val, rslt_v='no', nfg_v='no', dst_v='no'):
 def get_accuracy(predictions, labels):
     """Returns the accuracy based on the coincidences between predictions and labels"""
     # 본 정확도는 test 데이터에 대해서만 환산됨에 유의...
-    accuracy = (np.squeeze(predictions) == labels).mean()   # predictions와 labels shape 맞춰주기
+    accuracy = (np.squeeze(predictions) == np.squeeze(labels)).mean()   # predictions와 labels shape 맞춰주기
     return accuracy * 100   # labels가 10개라서 맞힌 갯수를 평균(mean)을 구해서 100을 곱하면 정확도가 나온다.
 
 for k in K:
@@ -214,8 +220,8 @@ for k in K:
 
     # 보류: 다른 방법으로 정확도를 계산해보려 했는데 안됨. 현재 어디가 오류인지 모르겠음..
     # 다른 예제에서 사용하였던 함수로 accuracy를 구해본다.
-    # acc = get_accuracy(results, labels)
-    # print(f"k={k}: Accuracy2={acc:#6.2f}")
+    acc = get_accuracy(results, labels)
+    print(f"k={k}: Accuracy2={acc:#6.2f}")
 
 
 
