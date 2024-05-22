@@ -5,14 +5,10 @@ import matplotlib.pyplot as plt
 # 시드 값 설정
 np.random.seed(51)
 
-image_size = (200, 200, 3)
-image = np.zeros(image_size, dtype=np.uint8)
-
 # 중복 없는 학습 데이터 생성
 L = 20
 data = np.random.randint(0, 200, (L, 2)).astype(np.float32)
 data = np.unique(data, axis=0)
-
 while len(data) < L:
     newData = np.random.randint(0,200,(L-len(data),2)).astype(np.float32)
     data = np.append(data, newData, axis=0)
