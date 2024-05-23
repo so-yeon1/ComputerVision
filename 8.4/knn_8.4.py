@@ -1,38 +1,30 @@
 import cv2
 import numpy as np
 import os
-import sys
-from pympler import asizeof
 from memory_profiler import profile
-import psutil
 
+## knn 모델 저장 및 크기 반환
 def model_size(model, filename):
     model.save(filename)
-    pid = os.getpid()
-    process = psutil.Process(pid)
-    memory = process.memory_info().rss
-    memory_size = memory
-    # print(f"사용 중인 메모리: {memory / 1024 ** 2}MiB")
+    return os.path.getsize(filename)
 
-    return os.path.getsize(filename), asizeof.asizeof(model) # sys.getsizeof(model) #memory_size
-
+## 학습 전 knn 크기
 def initial_knn(knn):
-    initial_size, initial_mem = model_size(knn, 'knn_initial.xml')
+    initial_size = model_size(knn, 'knn_initial.xml')
     print("[학습 전]")
     print(f"knn 크기: {initial_size} bytes")
-    print(f"knn 메모리: {initial_mem} bytes")
     print()
     return knn
 
+## 학습 후 knn 크기
 def trained_knn(knn):
-    trained_size, trained_mem = model_size(knn, 'knn_trained.xml')
+    trained_size = model_size(knn, 'knn_trained.xml')
     print("[학습 후]")
     print(f"knn 크기: {trained_size} bytes")
-    print(f"knn 메모리: {trained_mem} bytes")
 
-@profile
+@profile    # 메모리 사용량 추적
 def main():
-    L=20
+    L=20    # 학습데이터 수
     data = np.random.randint(0, 100, (L, 2)).astype(np.float32)
     labels = np.random.randint(0, 2, (L, 1)).astype(np.int32)
 
@@ -46,3 +38,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
